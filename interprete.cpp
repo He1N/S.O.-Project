@@ -20,11 +20,19 @@ int main() {
 
         if (input != "salir") { // Si la entrada no es "salir", se procede a analizar y ejecutar el comando
             vector<string> args;
-          
+            string output_file; // Esta variable se utiliza para almacenar el nombre del archivo de salida.
+            bool redirect_output = false; /* Esta línea inicializa un indicador booleano que
+			 indica si la salida se debe redireccionar 
+			a un archivo en lugar de mostrarse en la terminal.*/
+
            // Analiza la entrada en busca de argumentos y redirección de salida
             for (size_t i = 0; i < input.size(); i++) {
             	
-				if (input[i] != ' ') {
+                if (input[i] == '>') {
+                    redirect_output = true;
+                    output_file = input.substr(i + 2);
+                    break;
+                } else if (input[i] != ' ') {
                     size_t arg_start = i; // se utiliza para almacenar la posición inicial del primer argumento del comando
                     while (i < input.size() && input[i] != ' ' && input[i] != '>') {
                         i++;
