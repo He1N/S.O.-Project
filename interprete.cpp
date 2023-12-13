@@ -41,6 +41,32 @@ int main() {
                     i--;
                 }
             }
+            
+            
+            
+            pid_t pid = fork();  // se utiliza para crear un proceso hijo que ejecutará el comando ingresado por el usuario
+           
+		    if (pid == 0) {
+                // Proceso hijo
+                string command = args[0];
+
+                // revisión si es que el comando inicia con ./ o / "./"
+                if (command.substr(0, 2) != "./" && command[0] != '/') {
+                    // se considerará el directorio bin
+                    command = bin_dir + command;
+                }
+
+                // Redirigir la salida si es necesario
+                if (redirect_output) {
+                    int fd = open(output_file.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+                    /* La función open se utiliza para abrir el archivo de salida.*/
+                    /* El primer argumento de open es el nombre de archivo que se desea abrir*/
+                    /*  para abrir el archivo en modo de escritura, crearlo si no existe y truncarlo a cero bytes si ya existe, respectivamente.*/
+                    // El tercer argumento (0644) especifica los permisos del archivo.
+                    dup2(fd, STDOUT_FILENO);
+                    close(fd);
+                }
         }
      } while (input != "salir");
 
