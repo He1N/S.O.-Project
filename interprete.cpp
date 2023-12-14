@@ -5,7 +5,6 @@
 #include <sys/wait.h> // Define funciones utilizadas para retener procesos.
 #include <fcntl.h>  //  Define las opciones de control de archivos.
 
-using namespace std;
 
 int main() {
 	
@@ -22,8 +21,7 @@ int main() {
             vector<string> args;
             string output_file; // Esta variable se utiliza para almacenar el nombre del archivo de salida.
             bool redirect_output = false; /* Esta línea inicializa un indicador booleano que
-			 indica si la salida se debe redireccionar 
-			a un archivo en lugar de mostrarse en la terminal.*/
+			 indica si la salida se debe redireccionar */
 
            // Analiza la entrada en busca de argumentos y redirección de salida
             for (size_t i = 0; i < input.size(); i++) {
@@ -41,9 +39,8 @@ int main() {
                     i--;
                 }
             }
-            
-            
-            
+
+          
             pid_t pid = fork();  // se utiliza para crear un proceso hijo que ejecutará el comando ingresado por el usuario
            
 		    if (pid == 0) {
@@ -59,7 +56,7 @@ int main() {
                 // Redirigir la salida si es necesario
                 if (redirect_output) {
                     int fd = open(output_file.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
-
+                    /* fd : descriptor de archivo*/
                     /* La función open se utiliza para abrir el archivo de salida.*/
                     /* El primer argumento de open es el nombre de archivo que se desea abrir*/
                     /*  para abrir el archivo en modo de escritura, crearlo si no existe y truncarlo a cero bytes si ya existe, respectivamente.*/
@@ -67,6 +64,33 @@ int main() {
                     dup2(fd, STDOUT_FILENO);
                     close(fd);
                 }
-        }
-     } while (input != "salir");
 
+              
+                char** argv = new char*[args.size() + 1];  // En esta línea se declara un puntero a un puntero de caracteres
+                
+				
+				
+				for (size_t i = 0; i < args.size(); i++) { /* se recorre el vector args y se asigna a cada elemento del vector argv el puntero a la cadena de caracteres correspondiente. */
+                    argv[i] = const_cast<char*>(args[i].c_str());
+                }
+                argv[args.size()] = NULL;
+                
+           
+                execv(command.c_str(), argv);
+                /* Se ejecuta el comando o programa utilizando la función execv */
+                cerr << "Error: comando no encontrado" << endl;
+                
+                exit(1);
+            } else if (pid > 0) {
+             
+                int status;
+                waitpid(pid, &status, 0);
+            } else {
+                cerr << "Error: fork, fallo" << endl;
+                exit(1);
+            }
+        }
+    } while (input != "salir");
+
+    return 0;
+}
